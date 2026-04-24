@@ -1,23 +1,22 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { motion } from "motion/react";
-import { Button } from "./ui/button";
+
 import { useRouter } from "next/navigation";
 
-export default function LandingPage() {
+export default function CreateRoomPage() {
     const router = useRouter()
   return (
     <div className="flex items-center justify-center min-h-screen bg-black">
       <div className="relative w-80 h-48 rounded-2xl overflow-hidden">
         
         {/* Card Content */}
-        <div className="absolute inset-[1px] flex-col gap-4 bg-zinc-900 rounded-2xl z-10 flex items-center justify-center text-white text-xl font-semibold">
-          <Button className="bg-white text-black px-8 cursor-pointer text-lg font-semibold " onClick={()=>{
-            router.push("/create-room")
-          }}>Create Room </Button>
-          <Button className="bg-white text-black px-9.5 text-lg cursor-pointer font-semibold" onClick={()=>{
-            router.push('/join-room')
-          }}>Join Room</Button>
+        <div className="absolute inset-[1px] flex-col gap-4 bg-zinc-900 rounded-2xl z-10 flex items-center justify-center text-white text-xl font-semibold p-4">
+            <Input placeholder="Enter room name" className="bg-zinc-800 text-white w-full" />
+            <Input placeholder="Enter room password" className="bg-zinc-800 text-white w-full" />
+          <Button className="bg-white text-black px-9.5 text-lg cursor-pointer font-semibold">Create Room</Button>
         </div>
 
         {/* Animated Border */}
