@@ -6,7 +6,10 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@better-auth/prisma-adapter": "^1.6.9",
+    "better-auth": "^1.6.9",
+    "elysia": "latest",
+    "@repo/db": "workspace:*"
   },
   "devDependencies": {
     "bun-types": "latest"
