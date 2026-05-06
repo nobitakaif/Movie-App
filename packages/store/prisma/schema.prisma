@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserType {
+  ADMIN
+  USER
+}
+model User{
+  id          String    @id  @default(uuid())
+  name        String
+  email       String  @unique
+  password    String
+  role        UserType  @default(USER)
+  createdAt   DateTime @default(now())
+  room        Room[]  @relation("RoomAdmin")
+  memberships RoomMember[]
+}
+
+model Room{
+  id          String    @id   @default(uuid())
+  name        String
+  adminId     String
+  admin       User  @relation("RoomAdmin",fields: [adminId], references: [id])
+  videoUrl    String?
+  createdAt   DateTime @default(now())
+  roomMembers RoomMember[]
+  state       RoomState?
+}
+
+model RoomMember{
+  id          String    @id @default(uuid())
+  userId      String
+  user        User  @relation(fields: [userId], references: [id])
+  roomId      String
+  room        Room    @relation(fields: [roomId], references: [id])
+  joinedAt    DateTime  @default(now())
+  @@unique([userId,roomId])
+}
+
+model RoomState{
+  id          String    @id   @default(uuid())
+  roomId      String  @unique
+  room        Room @relation(fields: [roomId], references: [id])
+  isPlaying   Boolean @default(false)
+  currentTime Float @default(0)
+  updatedAt   DateTime  @updatedAt
+}
+
