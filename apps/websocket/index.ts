@@ -1,11 +1,17 @@
 let userCount = 1;
 interface dataView {
     type : "join_room" | "chat",
-    name? : string,
-    roomId? : string,
+    name : string,
+    roomId : string,
     message? : string
 }
-let users :dataView[] = []
+
+type User = {
+    ws : any,
+    name : string,
+    roomId : string
+}
+let users : User[] = []
 Bun.serve({
   fetch(req, server) {
     if (server.upgrade(req)) {
@@ -20,8 +26,7 @@ Bun.serve({
     
     message(ws, message : string){
         
-        console.table(users)
-        console.log(`\n\nuser ${users[users.length-1]}`)
+        
         const recievedData : dataView = JSON.parse(message)
         if(recievedData.type == "join_room"){
             const alreadyData = users.find(item => item.name === recievedData.name) ?? null
@@ -29,10 +34,24 @@ Bun.serve({
                 ws.send(`user is already joined into roomId ${alreadyData.roomId}`  )
             }
             else{
-                users.push(recievedData)
+
+                users.push({
+                    ws,
+                    name : recievedData.name,
+                    roomId : recievedData.roomId,
+                })
+                ws.send("user joined successfully")
             }
         }
-        ws.send(message)
+        else if(recievedData.type == "chat"){
+            users.forEach(user =>{
+                if(user.roomId === recievedData.roomId){
+                    user.ws.send(`${recievedData.name} : ${recievedData.message}`)
+                }
+            })
+        }
+        // console.table(users)
+        console.log(JSON.stringify(users, null, 2))
     },
     open(ws){
         console.log(`${userCount} user connectecd`)
