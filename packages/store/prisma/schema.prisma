@@ -23,19 +23,20 @@ model User{
   password    String
   role        UserType  @default(USER)
   createdAt   DateTime @default(now())
-  room        Room[]  @relation("RoomAdmin")
+  room        Room[]
   memberships RoomMember[]
 }
 
 model Room{
   id          String    @id   @default(uuid())
-  name        String
+  name        String    
   adminId     String
-  admin       User  @relation("RoomAdmin",fields: [adminId], references: [id])
+  admin       User  @relation(fields: [adminId], references: [id])
   videoUrl    String?
   createdAt   DateTime @default(now())
   roomMembers RoomMember[]
   state       RoomState?
+  @@unique([adminId, name])
 }
 
 model RoomMember{
