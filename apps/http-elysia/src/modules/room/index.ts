@@ -1,4 +1,4 @@
-import Elysia, { status } from "elysia";
+import Elysia, { status, t } from "elysia";
 import { RoomModel } from "./model";
 import { RoomService } from "./service";
 import jwt from "@elysiajs/jwt";
@@ -18,7 +18,7 @@ export const room = new Elysia({prefix : "/room"})
                 error : "UNAUTHORIZED"
             })
         }
-
+        console.log("\n\tauth token ", auth.value)
         const decodedToken = await jwt.verify(auth.value as string)
         console.log("decoded token -> ",decodedToken)
         if(!decodedToken || typeof decodedToken.sub !== "string"){
@@ -35,7 +35,7 @@ export const room = new Elysia({prefix : "/room"})
         const { name, videoUrl } = body
 
         const adminId = userId
-        console.log(`adminId : ${adminId}`)
+        console.log(`adminId : ${adminId}\n\n`)
         const room = await RoomService.createRoom({ name, videoUrl, adminId})
         if('roomId' in room){
             return status(200, {
@@ -51,5 +51,20 @@ export const room = new Elysia({prefix : "/room"})
         response : {
             200 : RoomModel.createRoomResponse,
             400 : RoomModel.failedRoomCreation
+        }
+    })
+    .get("/:roomId", async ({params})=>{
+        console.log(params.roomId)   
+        return status(200, {
+            roomId : params.roomId
+        })
+    }, {
+        params : t.Object({
+            roomId : t.String()
+        }),
+        response : {
+            200 : t.Object({
+                roomId : t.String()
+            })
         }
     })

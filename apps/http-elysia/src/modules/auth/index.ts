@@ -32,8 +32,9 @@ export const auth = new Elysia({prefix : "auth"})
     .post("/signin", async function ({body, jwt, cookie : {auth}}){
         const { email, password } = body
         const  res = await UserService.signin({ email, password })
+        
         if('id' in res){
-            
+            console.log('user_id -> ', res.id)    
             const token = await jwt.sign({ sub : res.id})
             console.log(token)
             auth.set({

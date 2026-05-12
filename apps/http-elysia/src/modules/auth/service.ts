@@ -26,27 +26,32 @@ export abstract class UserService {
 
     }
     static async signin({email, password} : UserModel.SiginSchema) : Promise< {id : string} | UserModel.SigninFailed>{
-        const user = await prisma.user.findFirst({
-            where : {
-                email : email
-            }
-        })
-
-        
-        console.log(user)
-        if(user){
-            const checkPassword = await Bun.password.verify(password, user.password)
-            if(!checkPassword){
+       try{
+            const user = await prisma.user.findFirst({
+                where : {
+                    email : email
+                }
+            })
+            console.log(user)
+            if(user){
+                const checkPassword = await Bun.password.verify(password, user.password)
+                if(!checkPassword){
+                    return {
+                        msg : "incorrect password"
+                    }
+                }
                 return {
-                    msg : "incorrect password"
+                    id : user.id
                 }
             }
             return {
-                id : user.id
-            }
+                    msg : "User not FOUND!"
+                }
         }
-        return {
-            msg : "user not found"
+        catch(e){
+            return {        
+                msg : "user not found"
+            }
         }
     }
 }
