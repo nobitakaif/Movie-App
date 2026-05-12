@@ -125,4 +125,52 @@ export abstract class RoomService{
             }
         }
     }
+
+    static async joinRoom({ roomName, userId, adminName } : RoomModel.JoinRoomBody) : Promise<RoomModel.JoinRoomResponse |  RoomModel.JoinRoomFailed>{
+        try{
+            const isRoom = await prisma.room.findFirst({
+                where : {
+                    name : roomName,
+                }, 
+                select : {
+                    admin : {
+                        select : {
+                            name : true
+                        }
+                    },
+                    id : true
+                }
+            })
+            if(!isRoom){
+                return {
+                    msg : "Room not Found",
+                    success : false
+                }
+            }
+            const userJoin = await prisma.roomMember.create({
+                data : {
+                    roomId : isRoom.id,
+                    userId,
+                }
+            })
+
+            if(!userJoin){
+                return {
+                    success : false,
+                    msg : "You're already joined"
+                }
+            }
+            
+            return {
+                success : true,
+                msg : "User joined successfully",
+                id : userJoin.id
+            }
+        }catch(e){
+            return {
+                success : false,
+                msg : "Please try again!"
+            }
+        }
+    }
 }

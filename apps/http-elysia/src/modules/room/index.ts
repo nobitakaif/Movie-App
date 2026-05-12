@@ -94,3 +94,28 @@ export const room = new Elysia({prefix : "/room"})
             400 : RoomModel.getRoomIdFailed
         }
     })
+    .post("/:roomName/:adminName/join", async ({ params, userId }) =>{
+        const { roomName, adminName } = params
+        
+        const joinedRoom = await RoomService.joinRoom({ roomName, userId, adminName })
+        if('id' in joinedRoom){
+            return status(200, {
+                msg : "user joined Successfull",
+                success : joinedRoom.success,
+                id : joinedRoom.id
+            })
+        }
+        return status(400,{
+            msg : joinedRoom.msg,
+            success : joinedRoom.success
+        })
+    }, {
+        params : t.Object({
+            roomName : t.String(),
+            adminName : t.String()
+        }),
+        response : {
+            200 : RoomModel.joinRoomResponse,
+            400 : RoomModel.joinRoomFailed
+        }
+    })

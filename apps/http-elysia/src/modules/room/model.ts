@@ -48,4 +48,24 @@ export namespace RoomModel{
         msg : t.String()
     })
     export type GetRoomIdFailed = typeof getRoomIdFailed.static
+
+    export const joinRoomBody = t.Object({
+        roomName : t.String(),
+        userId : t.String(),
+        adminName : t.String()
+    })
+    export type JoinRoomBody = typeof joinRoomBody.static
+    
+    export const joinRoomResponse = t.Object({
+        success : t.Boolean({ default : true}),
+        msg : t.String(),
+        id : t.String()
+    })
+    export type JoinRoomResponse = typeof joinRoomResponse.static
+
+    export const joinRoomFailed = t.Object({
+        success : t.Boolean({ default : false}),
+        msg : t.String({})
+    })
+    export type JoinRoomFailed = typeof joinRoomFailed.static
 }
