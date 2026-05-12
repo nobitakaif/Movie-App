@@ -53,18 +53,44 @@ export const room = new Elysia({prefix : "/room"})
             400 : RoomModel.failedRoomCreation
         }
     })
-    .get("/:roomId", async ({params})=>{
-        console.log(params.roomId)   
+    .get("/:roomName", async ({params})=>{
+        console.log(params.roomName)   
+        const { roomName } = params
+        const room = await RoomService.getRoomId({ roomName })
+        if('msg' in room){
+            return status(400, {
+                msg : room.msg
+            })
+        }
+
         return status(200, {
-            roomId : params.roomId
+            roomId : room.roomId,
+            roomName : room.roomName,
+            videoUrl : room.videoUrl ?? "URL not provided yet",
+
+            admin : {
+                adminId : room.admin.adminId,
+                adminName : room.admin.adminName
+            },
+
+            roomMember : room.roomMember.map((member)=>({
+                id : member.id,
+                name : member.name,
+                joinedAt : member.joinedAt
+            })),
+            playbackState : {
+                currentTime : room.playbackState.currentTime,
+                isPlaying : room.playbackState.isPlaying
+            },
+            roomCreatedAt : room.roomCreatedAt
+
         })
     }, {
         params : t.Object({
-            roomId : t.String()
+            roomName : t.String()
         }),
         response : {
-            200 : t.Object({
-                roomId : t.String()
-            })
+            200 : RoomModel.getRoomIdResponse,
+            400 : RoomModel.getRoomIdFailed
         }
     })
