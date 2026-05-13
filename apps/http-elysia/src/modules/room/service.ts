@@ -38,12 +38,15 @@ export abstract class RoomService{
         }
     }
 
-    static async getRoomId({roomName} : {roomName : string}) : Promise<RoomModel.GetRoomIdResponse | RoomModel.GetRoomIdFailed> {
+    static async getRoomId({roomName, adminName} : {roomName : string, adminName : string}) : Promise<RoomModel.GetRoomIdResponse | RoomModel.GetRoomIdFailed> {
         try{
 
             const roomId = await prisma.room.findFirst({
                 where : {
-                    name : roomName 
+                    name : roomName,
+                    admin : {
+                        name : adminName
+                    }
                 },
                 select : {
                     id : true
@@ -170,6 +173,39 @@ export abstract class RoomService{
             return {
                 success : false,
                 msg : "Please try again!"
+            }
+        }
+    }
+
+    static async leaveRoom({roomId, userId} : RoomModel.LeaveRoomBody) : Promise<RoomModel.LeaveRoomResponse>{
+        try{
+            const isLeaved = await prisma.roomMember.delete({
+                where : {
+                    userId_roomId : {
+                        userId, 
+                        roomId
+                    }
+                },
+                select : {
+                    room : {
+                        select : {
+                            name : true
+                        }
+                    },
+                    id : true
+                }
+            }) 
+            
+            return {
+                success : true,
+                msg : "You leaved Room successfull from :" + isLeaved.room.name
+            }
+        
+            
+        }catch(e){
+            return {
+                success : false,
+                msg : "please try again, you didn't leaved rooom!"
             }
         }
     }

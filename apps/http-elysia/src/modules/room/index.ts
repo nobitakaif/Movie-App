@@ -12,14 +12,17 @@ export const room = new Elysia({prefix : "/room"})
             secret : process.env.JWT_SECREt!
         })
     )
-    .resolve(async({cookie : {auth}, jwt, status})=>{
+    .resolve(async({cookie : {auth}, jwt, status, headers})=>{
         if(!auth?.value){
             return status(401, {
                 error : "UNAUTHORIZED"
             })
         }
         console.log("\n\tauth token ", auth.value)
-        const decodedToken = await jwt.verify(auth.value as string)
+
+        const token = headers['authorization']
+        console.log('auth headers -> ',token)
+        const decodedToken = await jwt.verify(token)
         console.log("decoded token -> ",decodedToken)
         if(!decodedToken || typeof decodedToken.sub !== "string"){
             return status(403, {
@@ -53,10 +56,10 @@ export const room = new Elysia({prefix : "/room"})
             400 : RoomModel.failedRoomCreation
         }
     })
-    .get("/:roomName", async ({params})=>{
+    .get("/:roomName/:adminName", async ({params})=>{
         console.log(params.roomName)   
-        const { roomName } = params
-        const room = await RoomService.getRoomId({ roomName })
+        const { roomName, adminName } = params
+        const room = await RoomService.getRoomId({ roomName, adminName })
         if('msg' in room){
             return status(400, {
                 msg : room.msg
@@ -87,7 +90,8 @@ export const room = new Elysia({prefix : "/room"})
         })
     }, {
         params : t.Object({
-            roomName : t.String()
+            roomName : t.String(),
+            adminName : t.String()
         }),
         response : {
             200 : RoomModel.getRoomIdResponse,
@@ -117,5 +121,27 @@ export const room = new Elysia({prefix : "/room"})
         response : {
             200 : RoomModel.joinRoomResponse,
             400 : RoomModel.joinRoomFailed
+        }
+    })
+    .delete("/:roomId", async ({params, userId})=>{
+        const { roomId } = params
+        const isLeaved = await RoomService.leaveRoom({roomId, userId})
+        if(isLeaved.success){
+            return status(200, {
+                success : isLeaved.success,
+                msg : isLeaved.msg
+            })
+        }
+        return status(400,{
+            success : isLeaved.success,
+            msg : isLeaved.msg
+        })
+    }, {
+        params : t.Object({
+            roomId : t.String()
+        }),
+        response : {
+            200 : RoomModel.leaveRoomResponse,
+            400 : RoomModel.leaveRoomResponse
         }
     })
