@@ -179,6 +179,7 @@ export abstract class RoomService{
 
     static async leaveRoom({roomId, userId} : RoomModel.LeaveRoomBody) : Promise<RoomModel.LeaveRoomResponse>{
         try{
+            // TODO : use deleteMany because if multipul request comes then it will fail, fix this later
             const isLeaved = await prisma.roomMember.delete({
                 where : {
                     userId_roomId : {

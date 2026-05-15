@@ -1,3 +1,4 @@
+import { prisma } from "@repo/db";
 import { authClient } from "../../better-auth/auth";
 
 
@@ -7,7 +8,6 @@ export abstract class UserService {
         const response = await authClient.signIn.social({
             provider : "google"
         })
-        
         console.log("data recieved -> ",response.data)
         return response.data?.redirect
     }

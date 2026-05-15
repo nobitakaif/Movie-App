@@ -111,6 +111,7 @@ const server = Bun.serve({
                             type : "PLAY",
                             currentTime : data.currentTime ?? 0
                         }))
+                        console.log("admin played the playback!")
                     }
                 }
                 return 
