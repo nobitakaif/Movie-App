@@ -32,8 +32,10 @@ const server = Bun.serve({
     websocket : {
         data :{} as WebSocketType,
         open(ws){
-            ws.send("you're connected")
-            // console.log(ws.data?.token)
+            ws.send(JSON.stringify({
+                success : "you're connected"
+            }))
+            console.log(ws.data?.token)
             const user  =jwtVerify({token : ws.data.token})
             // console.log(userId)
             if(!user?.userId){
@@ -74,6 +76,8 @@ const server = Bun.serve({
                 return 
             }
 
+            console.log("response ", JSON.stringify(message))
+            
             let data: any
             try{
                 data = JSON.parse(message.toString())
@@ -82,7 +86,7 @@ const server = Bun.serve({
                 return 
             }
 
-            // for requesting memeber to admin
+            // user is req to admin
             if(data.type === 'PLAY_REQUEST'){
                 for(const client of allUser){
                     if(client.data.isAdmin){
@@ -98,21 +102,33 @@ const server = Bun.serve({
             if(data.type === 'PLAY'){
 
                 if(!ws.data.isAdmin){
+
+                    for(const client of allUser){
+                        if(client.data.isAdmin){
+                            client.send(JSON.stringify({
+                                type: "PLAY_REQUEST",
+                                from: ws.data.userId,
+                                currentTime: data.currentTime ?? 0
+                            }))
+                        }
+                    }
+                    
                     ws.send(JSON.stringify({
                         type : "ERROR", 
                         message : "Only admin can control playback!"
                     }))
+                    console.log("this is not admin!")
                     return  
                 }
                 
                 for(const client of allUser){
-                    if(client !== ws){
+                    // if(client !== ws){
                         client.send(JSON.stringify({
                             type : "PLAY",
                             currentTime : data.currentTime ?? 0
                         }))
-                        console.log("admin played the playback!")
-                    }
+                        console.log("admin played the playback")
+                    // }
                 }
                 return 
             }
