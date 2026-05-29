@@ -30,7 +30,8 @@ export namespace RoomModel{
         roomCreatedAt : t.String({format : "date-time"}),
         admin : t.Object({
             adminId : t.String(),
-            adminName : t.String()
+            adminName : t.String(),
+            adminEmail : t.String()
         }),
         roomMember : t.Array(t.Object({
             id : t.String(),

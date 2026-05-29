@@ -73,7 +73,8 @@ export const room = new Elysia({prefix : "/room"})
 
             admin : {
                 adminId : room.admin.adminId,
-                adminName : room.admin.adminName
+                adminName : room.admin.adminName,
+                adminEmail : room.admin.adminEmail
             },
 
             roomMember : room.roomMember.map((member)=>({

@@ -57,6 +57,7 @@ export abstract class RoomService{
                     msg : "Room Not Found!"
                 }
             }
+            console.log("roomId -> ",JSON.stringify(roomId))
             const room = await prisma.room.findUnique({
                 where : {
                     id : roomId.id
@@ -70,7 +71,8 @@ export abstract class RoomService{
                     admin :{
                         select : {
                             id : true,
-                            name : true
+                            name : true,
+                            email : true
                         }
                     },
 
@@ -94,6 +96,8 @@ export abstract class RoomService{
                 },
             })
 
+            console.log("actual room -> ", JSON.stringify(room))
+
             if(room){
                 return {
                     roomId : room?.id,
@@ -102,7 +106,8 @@ export abstract class RoomService{
 
                     admin : {
                         adminId : room.admin.id,
-                        adminName : room.admin.name
+                        adminName : room.admin.name,
+                        adminEmail : room.admin.email ?? "akk"
                     },
 
                     roomMember : room.roomMembers.map((member)=>({

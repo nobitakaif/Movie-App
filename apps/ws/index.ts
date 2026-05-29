@@ -55,10 +55,11 @@ const server = Bun.serve({
             let room = rooms.get(roomId)
 
             if (!room) {
+                console.log("new room createing....")
                 room = new Set()
                 rooms.set(roomId, room)
             }
-
+            
             ws.data.isAdmin = room.size === 0
 
             room.add(ws)
@@ -67,6 +68,7 @@ const server = Bun.serve({
                 `Rooms ${roomId} users :`,
                 rooms.get(roomId)?.size
             )
+            console.log("room state -> ", JSON.stringify(rooms))
         },
         message(ws, message){
             // frontend will send 'PLAY' (socket.send('PLAY'))
@@ -147,7 +149,7 @@ const server = Bun.serve({
                 return
             }
 
-            // if admin left → assign new admin
+            // if admin left -> assign new admin
             let hasAdmin = false
 
             for (const client of room) {
